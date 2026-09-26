@@ -242,7 +242,7 @@ enum ShortcutAction: String, CaseIterable, Identifiable, Codable {
         case .toggleFrame:
             if store.tabLayout != .sidebar {
                 withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
-                    store.enableWindowBorder.toggle()
+                    store.toggleWindowBorder()
                 }
             }
         case .toggleSidebar:

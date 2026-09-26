@@ -696,27 +696,13 @@ private struct GeneralSection: View {
                     uiFont: store.leanUIFont
                 )
 
-                if store.tabLayout != .sidebar {
-                    SettingsRowDivider(isDark: store.isDarkMode)
+                SettingsRowDivider(isDark: store.isDarkMode)
 
-                    CustomToggleRow(
-                        title: "Window frame",
-                        subtitle: "Encase the web view in an elegant, minimal outer border with adaptive light/dark appearance.",
-                        isOn: $store.enableWindowBorder,
-                        isDark: store.isDarkMode,
-                        uiFont: store.leanUIFont
-                    )
-                }
-
-                if store.enableWindowBorder {
-                    SettingsRowDivider(isDark: store.isDarkMode)
-
-                    FrameWidthPickerRow(
-                        store: store,
-                        isDark: store.isDarkMode,
-                        uiFont: store.leanUIFont
-                    )
-                }
+                FrameWidthPickerRow(
+                    store: store,
+                    isDark: store.isDarkMode,
+                    uiFont: store.leanUIFont
+                )
             }
             .animation(.spring(response: 0.26, dampingFraction: 0.82), value: store.enableZenMode)
             .animation(.spring(response: 0.26, dampingFraction: 0.82), value: store.enableWindowBorder)

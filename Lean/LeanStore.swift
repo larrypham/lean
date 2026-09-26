@@ -361,9 +361,6 @@ final class LeanStore: ObservableObject {
     @Published var tabLayout: TabLayout {
         didSet {
             persist(tabLayout.rawValue, forKey: Self.tabLayoutKey)
-            if tabLayout == .sidebar {
-                enableWindowBorder = true
-            }
         }
     }
 
@@ -380,10 +377,6 @@ final class LeanStore: ObservableObject {
 
     @Published var enableWindowBorder: Bool {
         didSet {
-            if tabLayout == .sidebar && !enableWindowBorder {
-                enableWindowBorder = true
-                return
-            }
             persist(enableWindowBorder, forKey: Self.windowBorderKey)
         }
     }
@@ -397,6 +390,16 @@ final class LeanStore: ObservableObject {
     @Published var windowBorderWidth: CGFloat {
         didSet {
             persist(Double(windowBorderWidth), forKey: Self.windowBorderWidthKey)
+        }
+    }
+
+    func toggleWindowBorder() {
+        if enableWindowBorder {
+            windowBorderWidth = 0
+            enableWindowBorder = false
+        } else {
+            windowBorderWidth = 8
+            enableWindowBorder = true
         }
     }
 
@@ -609,7 +612,7 @@ final class LeanStore: ObservableObject {
         let savedBorder = databaseValue(self.database, Bool.self, forKey: Self.windowBorderKey)
             ?? UserDefaults.standard.object(forKey: Self.windowBorderKey) as? Bool
             ?? false
-        self.enableWindowBorder = resolvedTabLayout == .sidebar ? true : savedBorder
+        self.enableWindowBorder = savedBorder
 
         let savedBorderHex = databaseValue(self.database, String.self, forKey: Self.windowBorderColorKey)
             ?? UserDefaults.standard.string(forKey: Self.windowBorderColorKey)
@@ -619,7 +622,7 @@ final class LeanStore: ObservableObject {
         let savedBorderWidth = databaseValue(self.database, Double.self, forKey: Self.windowBorderWidthKey)
             ?? UserDefaults.standard.object(forKey: Self.windowBorderWidthKey) as? Double
             ?? 8.0
-        self.windowBorderWidth = CGFloat(savedBorderWidth)
+        self.windowBorderWidth = savedBorder ? CGFloat(savedBorderWidth) : 0
 
         // Load saved toolbar items (default to all shown, none hidden)
         let savedShown = databaseValue(self.database, [String].self, forKey: Self.shownToolbarItemsKey)

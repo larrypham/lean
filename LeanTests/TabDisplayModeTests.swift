@@ -75,6 +75,14 @@ struct TabDisplayModeTests {
         #expect(store.windowBorderWidth == 12.0)
         #expect(try database.value(Double.self, forKey: "windowBorderWidth").get() == 12.0)
 
+        store.toggleWindowBorder()
+        #expect(store.enableWindowBorder == false)
+        #expect(store.windowBorderWidth == 0)
+
+        store.toggleWindowBorder()
+        #expect(store.enableWindowBorder == true)
+        #expect(store.windowBorderWidth == 8.0)
+
         // Zen mode persistence and distinctness from window border
         store.enableZenMode = true
         #expect(store.enableZenMode == true)

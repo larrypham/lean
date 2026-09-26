@@ -105,6 +105,30 @@ open Lean.xcodeproj
 
 Select the `Lean` scheme and run.
 
+## Build release DMGs
+
+Create separate Apple Silicon and Intel disk images in `dist/`:
+
+```sh
+scripts/release_dmg.sh
+```
+
+To create only one architecture, run `scripts/build_dmg.sh arm64` or
+`scripts/build_dmg.sh x86_64`. By default the app is ad-hoc signed, matching
+the releases described above. For a notarized Developer ID release:
+
+```sh
+SIGNING_IDENTITY="Developer ID Application: Example (TEAMID)" \
+DEVELOPMENT_TEAM="TEAMID" \
+NOTARY_PROFILE="lean-notary" \
+scripts/release_dmg.sh
+```
+
+Create the Keychain profile once with `xcrun notarytool store-credentials`.
+The scripts read the version and build number from the Xcode project unless
+`VERSION` and `BUILD_NUMBER` are provided, validate the signed app and DMG,
+and write a SHA-256 checksum beside each image.
+
 ## Shortcuts
 
 | Shortcut | Action |

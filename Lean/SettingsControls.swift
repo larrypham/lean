@@ -893,6 +893,7 @@ struct FrameWidthPickerRow: View {
     @State private var hoveredWidth: CGFloat? = nil
 
     private let widths: [(label: String, width: CGFloat, previewLine: CGFloat)] = [
+        ("Borderless", 0.0, 0.0),
         ("Thin", 5.0, 1.5),
         ("Normal", 8.0, 3.0),
         ("Thick", 12.0, 5.0)
@@ -923,16 +924,28 @@ struct FrameWidthPickerRow: View {
 
             HStack(spacing: 2) {
                 ForEach(widths, id: \.width) { item in
-                    let isSelected = store.windowBorderWidth == item.width
+                    let isSelected = item.width == 0
+                        ? !store.enableWindowBorder
+                        : store.enableWindowBorder && store.windowBorderWidth == item.width
                     let isHovered = hoveredWidth == item.width
 
                     Button {
                         store.windowBorderWidth = item.width
+                        store.enableWindowBorder = item.width > 0
                     } label: {
                         HStack(spacing: 5) {
-                            Capsule()
-                                .fill(isSelected ? (isDark ? Color.white : Color(white: 0.10)) : (isDark ? Color.white.opacity(0.4) : Color.black.opacity(0.35)))
-                                .frame(width: 10, height: item.previewLine)
+                            if item.width == 0 {
+                                RoundedRectangle(cornerRadius: 1.5, style: .continuous)
+                                    .stroke(
+                                        isSelected ? (isDark ? Color.white : Color(white: 0.10)) : (isDark ? Color.white.opacity(0.4) : Color.black.opacity(0.35)),
+                                        style: StrokeStyle(lineWidth: 1, dash: [2, 2])
+                                    )
+                                    .frame(width: 10, height: 7)
+                            } else {
+                                Capsule()
+                                    .fill(isSelected ? (isDark ? Color.white : Color(white: 0.10)) : (isDark ? Color.white.opacity(0.4) : Color.black.opacity(0.35)))
+                                    .frame(width: 10, height: item.previewLine)
+                            }
 
                             Text(item.label)
                                 .font(uiFont.font(size: 11.5, weight: isSelected ? .semibold : .medium))

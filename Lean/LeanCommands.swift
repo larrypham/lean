@@ -83,7 +83,7 @@ struct LeanCommands: Commands {
             } else {
                 Button(store.enableWindowBorder ? "Hide Window Frame" : "Show Window Frame") {
                     withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
-                        store.enableWindowBorder.toggle()
+                        store.toggleWindowBorder()
                     }
                 }
                 .keyboardShortcut("b", modifiers: [.command, .shift])
