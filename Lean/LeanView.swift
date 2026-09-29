@@ -421,18 +421,28 @@ struct LeanView: View {
 
     // MARK: - Framed Sidebar Card
     private var sidebarCard: some View {
-        SidebarView(store: store)
-            .clipShape(RoundedRectangle(cornerRadius: store.adaptiveTheme.cardCornerRadius, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: store.adaptiveTheme.cardCornerRadius, style: .continuous)
-                    .stroke(store.adaptiveTheme.webCardStroke, lineWidth: 1)
-            )
-            .shadow(
-                color: store.adaptiveTheme.webCardShadow,
-                radius: 18,
-                x: 6,
-                y: 2
-            )
+        Group {
+            if #available(macOS 26.0, *) {
+                SidebarView(store: store)
+                    .glassEffect(
+                        .regular,
+                        in: .rect(cornerRadius: store.adaptiveTheme.cardCornerRadius)
+                    )
+            } else {
+                SidebarView(store: store)
+                    .clipShape(RoundedRectangle(cornerRadius: store.adaptiveTheme.cardCornerRadius, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: store.adaptiveTheme.cardCornerRadius, style: .continuous)
+                            .stroke(store.adaptiveTheme.webCardStroke, lineWidth: 1)
+                    )
+                    .shadow(
+                        color: store.adaptiveTheme.webCardShadow,
+                        radius: 18,
+                        x: 6,
+                        y: 2
+                    )
+            }
+        }
             .padding(.top, store.windowBorderWidth)
             .padding(.bottom, store.windowBorderWidth)
             .padding(.leading, store.windowBorderWidth)
@@ -1092,17 +1102,15 @@ private struct SavedPasswordSuggestions: View {
             .background(isDark ? Color.white.opacity(0.02) : Color.black.opacity(0.015))
         }
         .frame(width: 280, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(.regularMaterial)
+        .liquidGlassDialogSurface(
+            cornerRadius: 12,
+            legacyBackground: isDark ? Color.black.opacity(0.72) : Color.white.opacity(0.82),
+            legacyStroke: isDark ? Color.white.opacity(0.12) : Color.black.opacity(0.09),
+            primaryShadow: Color.black.opacity(isDark ? 0.35 : 0.12),
+            primaryShadowRadius: 16,
+            primaryShadowY: 6,
+            secondaryShadow: Color.black.opacity(isDark ? 0.15 : 0.04)
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(isDark ? Color.white.opacity(0.12) : Color.black.opacity(0.09), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .shadow(color: Color.black.opacity(isDark ? 0.35 : 0.12), radius: 16, x: 0, y: 6)
-        .shadow(color: Color.black.opacity(isDark ? 0.15 : 0.04), radius: 2, x: 0, y: 1)
         .padding(1)
     }
 }
@@ -1272,26 +1280,14 @@ private struct ZoomIndicatorView: View {
         }
         .padding(.horizontal, store.scaled(11))
         .padding(.vertical, store.scaled(6))
-        .background(
-            VisualEffectBlur(material: .hudWindow, blendingMode: .withinWindow)
-                .clipShape(Capsule())
-        )
-        .background(
-            (store.isDarkMode ? Color.black.opacity(0.65) : Color.white.opacity(0.80))
-                .clipShape(Capsule())
-        )
-        .overlay(
-            Capsule()
-                .strokeBorder(
-                    store.isDarkMode ? Color.white.opacity(0.12) : Color.black.opacity(0.08),
-                    lineWidth: 0.75
-                )
-        )
-        .shadow(
-            color: Color.black.opacity(store.isDarkMode ? 0.28 : 0.08),
-            radius: 8,
-            x: 0,
-            y: 3
+        .liquidGlassDialogSurface(
+            cornerRadius: 18,
+            legacyBackground: store.isDarkMode ? Color.black.opacity(0.65) : Color.white.opacity(0.80),
+            legacyStroke: store.isDarkMode ? Color.white.opacity(0.12) : Color.black.opacity(0.08),
+            legacyMaterial: .hudWindow,
+            primaryShadow: Color.black.opacity(store.isDarkMode ? 0.28 : 0.08),
+            primaryShadowRadius: 8,
+            primaryShadowY: 3
         )
     }
 }
@@ -1766,13 +1762,10 @@ private struct SplitPaneEmptyView: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
             .frame(maxWidth: 320)
-            .background(
-                store.adaptiveTheme.activeTabBackground,
-                in: RoundedRectangle(cornerRadius: 8, style: .continuous)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .stroke(store.adaptiveTheme.activeTabStroke.opacity(0.3), lineWidth: 1)
+            .liquidGlassControlSurface(
+                cornerRadius: 8,
+                legacyBackground: store.adaptiveTheme.activeTabBackground,
+                legacyStroke: store.adaptiveTheme.activeTabStroke.opacity(0.3)
             )
 
             Spacer()

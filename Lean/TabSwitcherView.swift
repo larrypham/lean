@@ -22,22 +22,19 @@ struct TabSwitcherView: View {
                         .padding(8)
                 }
             }
-            .background(
-                VisualEffectBlur(material: .hudWindow, blendingMode: .withinWindow)
-                    .clipShape(RoundedRectangle(cornerRadius: store.enableThumbnailsInTabSwitcher ? 18 : 14, style: .continuous))
+            .liquidGlassDialogSurface(
+                cornerRadius: store.enableThumbnailsInTabSwitcher ? 18 : 14,
+                legacyBackground: store.isDarkMode
+                    ? Color.black.opacity(0.80)
+                    : Color(white: 0.96).opacity(0.88),
+                legacyStroke: store.isDarkMode
+                    ? Color.white.opacity(0.14)
+                    : Color.black.opacity(0.08),
+                legacyMaterial: .hudWindow,
+                primaryShadow: Color.black.opacity(0.24),
+                primaryShadowRadius: 18,
+                primaryShadowY: 8
             )
-            .background(
-                (store.isDarkMode ? Color.black.opacity(0.80) : Color(white: 0.96).opacity(0.88))
-                    .clipShape(RoundedRectangle(cornerRadius: store.enableThumbnailsInTabSwitcher ? 18 : 14, style: .continuous))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: store.enableThumbnailsInTabSwitcher ? 18 : 14, style: .continuous)
-                    .stroke(
-                        store.isDarkMode ? Color.white.opacity(0.14) : Color.black.opacity(0.08),
-                        lineWidth: 1
-                    )
-            )
-            .shadow(color: Color.black.opacity(0.24), radius: 18, x: 0, y: 8)
             .fixedSize()
             .animation(.spring(response: 0.14, dampingFraction: 0.9), value: store.switcherSelectedIndex)
         }

@@ -83,7 +83,7 @@ struct SettingsView: View {
                 HStack(spacing: 0) {
                     sidebarView
                         .frame(width: 210)
-                        .background(sidebarBackground)
+                        .liquidGlassBarSurface(legacyBackground: sidebarBackground)
 
                     Rectangle()
                         .fill(dividerColor)
@@ -202,6 +202,7 @@ struct SettingsView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
         }
+        .liquidGlassBarSurface(legacyBackground: sidebarBackground)
     }
 
     // MARK: - Category Header
@@ -3068,16 +3069,14 @@ private struct SidebarCategoryButton: View {
             // Static background: no sliding pill, so the hit area never
             // moves between mouseDown and mouseUp.
             .background(
-                RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .fill(rowFill)
-                    .overlay(
-                        Group {
-                            if let stroke = rowStroke {
-                                RoundedRectangle(cornerRadius: 7, style: .continuous)
-                                    .stroke(stroke, lineWidth: 0.5)
-                            }
-                        }
-                    )
+                isHovered && !isSelected ? rowFill : Color.clear,
+                in: RoundedRectangle(cornerRadius: 7, style: .continuous)
+            )
+            .liquidGlassSelectedSurface(
+                isSelected: isSelected,
+                cornerRadius: 7,
+                legacyBackground: rowFill,
+                legacyStroke: rowStroke ?? .clear
             )
             .contentShape(Rectangle())
         }
@@ -3122,8 +3121,14 @@ private struct CompactCategoryButton: View {
             .padding(.horizontal, 12)
             .frame(height: 30)
             .background(
-                RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .fill(rowFill)
+                isHovered && !isSelected ? rowFill : Color.clear,
+                in: RoundedRectangle(cornerRadius: 7, style: .continuous)
+            )
+            .liquidGlassSelectedSurface(
+                isSelected: isSelected,
+                cornerRadius: 7,
+                legacyBackground: rowFill,
+                legacyStroke: .clear
             )
             .contentShape(Rectangle())
         }

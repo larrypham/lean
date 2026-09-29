@@ -583,6 +583,13 @@ final class PictureInPicture {
             layer?.borderColor = NSColor(white: 1.0, alpha: 0.16).cgColor
             layer?.borderWidth = 0.75
 
+            if #available(macOS 26.0, *) {
+                let glassSurface = NSGlassEffectView(frame: bounds)
+                glassSurface.autoresizingMask = [.width, .height]
+                glassSurface.style = .clear
+                addSubview(glassSurface)
+            }
+
             returnButton.image = Controls.glyph("arrow.up.forward", 11.5, weight: .semibold)
             returnButton.toolTip = "Return to tab (Return)"
             returnButton.target = self

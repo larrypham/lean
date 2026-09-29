@@ -65,14 +65,14 @@ struct BookmarksPaletteView: View {
             }
         }
         .frame(width: store.scaled(580))
-        .background(paletteBackground)
-        .overlay(paletteBorder)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .shadow(
-            color: Color.black.opacity(store.isDarkMode ? 0.40 : 0.12),
-            radius: 24,
-            x: 0,
-            y: 10
+        .liquidGlassDialogSurface(
+            cornerRadius: 14,
+            legacyBackground: store.themeColors.omnibarBackground,
+            legacyStroke: store.themeColors.omnibarBorder,
+            legacyMaterial: .hudWindow,
+            primaryShadow: Color.black.opacity(store.isDarkMode ? 0.40 : 0.12),
+            primaryShadowRadius: 24,
+            primaryShadowY: 10
         )
         .background(
             GeometryReader { geo in
@@ -481,16 +481,6 @@ struct BookmarksPaletteView: View {
         }
     }
 
-    // MARK: - Styling Helpers
-    private var paletteBackground: some View {
-        VisualEffectBlur(material: .hudWindow, blendingMode: .withinWindow)
-            .background(store.themeColors.omnibarBackground)
-    }
-
-    private var paletteBorder: some View {
-        RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .stroke(store.themeColors.omnibarBorder, lineWidth: 0.75)
-    }
 }
 
 // MARK: - Sleek Minimal Bookmark Row

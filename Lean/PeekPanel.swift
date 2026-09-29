@@ -58,20 +58,16 @@ struct PeekPanel: View {
                     }
                 }
                 .frame(width: cardWidth, height: cardHeight)
-                .background(cardBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(
-                            store.isDarkMode ? Color.white.opacity(0.12) : Color.black.opacity(0.08),
-                            lineWidth: 0.75
-                        )
-                )
-                .shadow(
-                    color: Color.black.opacity(store.isDarkMode ? 0.45 : 0.15),
-                    radius: 24,
-                    x: 0,
-                    y: 12
+                .liquidGlassDialogSurface(
+                    cornerRadius: 16,
+                    legacyBackground: cardBackground,
+                    legacyStroke: store.isDarkMode
+                        ? Color.white.opacity(0.12)
+                        : Color.black.opacity(0.08),
+                    usesLegacyBlur: false,
+                    primaryShadow: Color.black.opacity(store.isDarkMode ? 0.45 : 0.15),
+                    primaryShadowRadius: 24,
+                    primaryShadowY: 12
                 )
                 .transition(
                     .asymmetric(

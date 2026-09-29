@@ -7,10 +7,19 @@ struct SidebarView: View {
     @ObservedObject var store: LeanStore
     @Namespace private var sidebarTabSelectionNamespace
 
-    private var sidebarBackground: Color {
+    private var legacySidebarBackground: Color {
         store.adaptiveTheme.isBorderEnabled
             ? store.adaptiveTheme.activeTabBackground
             : (store.isDarkMode ? Color(red: 32/255, green: 33/255, blue: 38/255) : Color(white: 0.96))
+    }
+
+    @ViewBuilder
+    private var sidebarBackground: some View {
+        if #available(macOS 26.0, *) {
+            Color.clear
+        } else {
+            legacySidebarBackground
+        }
     }
 
     var body: some View {
@@ -26,7 +35,7 @@ struct SidebarView: View {
                     icon: .sidebar,
                     helpText: store.isSidebarCollapsed ? "Pin Sidebar (Always Expanded) (⌘S)" : "Enable Auto-hide (⌘S)",
                     size: 24,
-                    iconSize: 12,
+                    iconSize: 16,
                     color: store.isSidebarCollapsed ? store.adaptiveTheme.secondaryText : store.adaptiveTheme.primaryText,
                     hoverColor: store.adaptiveTheme.primaryText,
                     hoverBackground: store.adaptiveTheme.iconHoverBackground,
@@ -44,7 +53,7 @@ struct SidebarView: View {
                     icon: .arrowLeft,
                     helpText: "Back (⌘[)",
                     size: 24,
-                    iconSize: 12,
+                    iconSize: 16,
                     color: store.selectedTab?.canGoBack == true ? store.adaptiveTheme.primaryText : store.adaptiveTheme.disabledIconText,
                     hoverColor: store.adaptiveTheme.primaryText,
                     disabledColor: store.adaptiveTheme.disabledIconText,
@@ -62,7 +71,7 @@ struct SidebarView: View {
                     icon: .arrowRight,
                     helpText: "Forward (⌘])",
                     size: 24,
-                    iconSize: 12,
+                    iconSize: 16,
                     color: store.selectedTab?.canGoForward == true ? store.adaptiveTheme.primaryText : store.adaptiveTheme.disabledIconText,
                     hoverColor: store.adaptiveTheme.primaryText,
                     disabledColor: store.adaptiveTheme.disabledIconText,
@@ -81,7 +90,7 @@ struct SidebarView: View {
                         icon: .x,
                         helpText: "Stop Loading (Esc)",
                         size: 24,
-                        iconSize: 12,
+                        iconSize: 16,
                         color: store.adaptiveTheme.primaryText,
                         hoverColor: store.adaptiveTheme.primaryText,
                         hoverBackground: store.adaptiveTheme.iconHoverBackground,
@@ -96,7 +105,7 @@ struct SidebarView: View {
                         icon: .arrowClockwise,
                         helpText: "Reload (⌘R)",
                         size: 24,
-                        iconSize: 12,
+                        iconSize: 16,
                         color: store.selectedTab?.url != nil ? store.adaptiveTheme.primaryText : store.adaptiveTheme.disabledIconText,
                         hoverColor: store.adaptiveTheme.primaryText,
                         disabledColor: store.adaptiveTheme.disabledIconText,
@@ -231,7 +240,7 @@ struct SidebarView: View {
                     icon: store.isDarkMode ? .sun : .moon,
                     helpText: store.isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode",
                     size: 24,
-                    iconSize: 12,
+                    iconSize: 16,
                     color: store.adaptiveTheme.secondaryText,
                     hoverColor: store.adaptiveTheme.primaryText,
                     hoverBackground: store.adaptiveTheme.iconHoverBackground,
@@ -247,7 +256,7 @@ struct SidebarView: View {
                     icon: .gear,
                     helpText: "Settings (⌘,)",
                     size: 24,
-                    iconSize: 12,
+                    iconSize: 16,
                     color: store.isQuickSettingsPresented ? store.adaptiveTheme.primaryText : store.adaptiveTheme.secondaryText,
                     hoverColor: store.adaptiveTheme.primaryText,
                     hoverBackground: store.adaptiveTheme.iconHoverBackground,
@@ -339,20 +348,6 @@ private struct SidebarAddressBar: View {
             }
     }
 
-    private var barBackground: some View {
-        RoundedRectangle(cornerRadius: 10, style: .continuous)
-            .fill(store.adaptiveTheme.inlineURLBarBackground)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(
-                        isFocused
-                            ? store.adaptiveTheme.activeTabStroke
-                            : store.adaptiveTheme.inlineURLBarStroke,
-                        lineWidth: 1
-                    )
-            )
-    }
-
     @ViewBuilder
     private var suggestionsOverlay: some View {
         if isFocused && !suggestions.isEmpty {
@@ -392,15 +387,15 @@ private struct SidebarAddressBar: View {
                 }
             }
             .padding(6)
-            .background(
-                store.adaptiveTheme.dropdownBackground,
-                in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .liquidGlassDialogSurface(
+                cornerRadius: 10,
+                legacyBackground: store.adaptiveTheme.dropdownBackground,
+                legacyStroke: store.adaptiveTheme.dropdownStroke,
+                usesLegacyBlur: false,
+                primaryShadow: store.adaptiveTheme.dropdownShadow,
+                primaryShadowRadius: 12,
+                primaryShadowY: 5
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(store.adaptiveTheme.dropdownStroke, lineWidth: 0.75)
-            )
-            .shadow(color: store.adaptiveTheme.dropdownShadow, radius: 12, x: 0, y: 5)
             .padding(.top, 40)
             .zIndex(100)
         }
@@ -456,7 +451,13 @@ private struct SidebarAddressBar: View {
         }
         .padding(.horizontal, store.scaled(10))
         .frame(height: store.scaled(36))
-        .background(barBackground)
+        .liquidGlassControlSurface(
+            cornerRadius: 10,
+            legacyBackground: store.adaptiveTheme.inlineURLBarBackground,
+            legacyStroke: isFocused
+                ? store.adaptiveTheme.activeTabStroke
+                : store.adaptiveTheme.inlineURLBarStroke
+        )
         .contentShape(Rectangle())
         .onTapGesture {
             isFocused = true
@@ -565,20 +566,15 @@ struct SidebarTabItem: View {
         .buttonStyle(.plain)
         .overlay { TabMiddleClick { onClose() } }
         .background {
-            ZStack {
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(isHovered ? store.adaptiveTheme.inactiveTabHoverBackground : Color.clear)
-
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .fill(store.adaptiveTheme.activeTabBackground)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                .stroke(store.adaptiveTheme.activeTabStroke, lineWidth: 1)
-                        )
-                }
-            }
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(isHovered ? store.adaptiveTheme.inactiveTabHoverBackground : Color.clear)
         }
+        .liquidGlassSelectedSurface(
+            isSelected: isSelected,
+            cornerRadius: 9,
+            legacyBackground: store.adaptiveTheme.activeTabBackground,
+            legacyStroke: store.adaptiveTheme.activeTabStroke
+        )
         .contentShape(Rectangle())
         .onDrag {
             store.draggingTabID = tab.id
@@ -935,24 +931,20 @@ private struct SidebarPinnedTabItem: View {
             .frame(maxWidth: .infinity)
             .frame(height: store.scaled(38))
             .background {
-                ZStack {
-                    if isHovered && !isSelected {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(store.isDarkMode ? Color.white.opacity(0.14) : Color.black.opacity(0.09))
-                    }
-                    if isSelected {
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(store.adaptiveTheme.activeTabBackground)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .stroke(store.adaptiveTheme.activeTabStroke, lineWidth: 0.75)
-                            )
-                    }
+                if isHovered && !isSelected {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(store.isDarkMode ? Color.white.opacity(0.14) : Color.black.opacity(0.09))
                 }
             }
             .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
         .buttonStyle(.plain)
+        .liquidGlassSelectedSurface(
+            isSelected: isSelected,
+            cornerRadius: 8,
+            legacyBackground: store.adaptiveTheme.activeTabBackground,
+            legacyStroke: store.adaptiveTheme.activeTabStroke
+        )
         .overlay(alignment: .bottomTrailing) {
             if tab.isPlayingMedia {
                 TabMediaIndicatorView(tab: tab, theme: store.adaptiveTheme, compact: true)
@@ -1204,4 +1196,3 @@ struct WindowDragView: NSViewRepresentable {
         }
     }
 }
-

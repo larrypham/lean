@@ -285,10 +285,10 @@ struct TopBarView: View {
             Spacer().frame(width: 12)
         }
         .frame(height: store.scaled(store.enableWindowBorder ? 34 : 36))
-        .background(
-            store.enableWindowBorder
-                ? AnyView(Color.clear)
-                : AnyView(store.themeColors.topBarBackground)
+        .liquidGlassBarSurface(
+            legacyBackground: store.enableWindowBorder
+                ? Color.clear
+                : store.themeColors.topBarBackground
         )
         // NOTE: no onTapGesture here on purpose. A tap gesture covering the
         // whole bar competes with every toolbar/tab Button inside it, forcing
@@ -376,28 +376,17 @@ private struct TopBarTabItem: View {
         .buttonStyle(.plain)
         .overlay { TabMiddleClick { onClose() } }
         .background {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(isHovered ? store.adaptiveTheme.inactiveTabHoverBackground : store.adaptiveTheme.inactiveTabBackground)
-
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(store.adaptiveTheme.activeTabBackground)
-                        .overlay(
-                            store.enableWindowBorder
-                                ? RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .stroke(store.adaptiveTheme.activeTabStroke, lineWidth: 1)
-                                : nil
-                        )
-                        .shadow(
-                            color: store.enableWindowBorder ? store.adaptiveTheme.activeTabShadow : Color.clear,
-                            radius: store.adaptiveTheme.isFrameLight ? 2 : 4,
-                            x: 0,
-                            y: 1
-                        )
-                }
-            }
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(isHovered ? store.adaptiveTheme.inactiveTabHoverBackground : store.adaptiveTheme.inactiveTabBackground)
         }
+        .liquidGlassSelectedSurface(
+            isSelected: isSelected && !showURLBar,
+            cornerRadius: 8,
+            legacyBackground: store.adaptiveTheme.activeTabBackground,
+            legacyStroke: store.enableWindowBorder ? store.adaptiveTheme.activeTabStroke : .clear,
+            legacyShadow: store.enableWindowBorder ? store.adaptiveTheme.activeTabShadow : .clear,
+            legacyShadowRadius: store.adaptiveTheme.isFrameLight ? 2 : 4
+        )
         .overlay {
             if showURLBar {
                 InlineURLBar(
@@ -863,24 +852,20 @@ private struct TopBarPinnedTabItem: View {
 
             .frame(width: store.scaled(28), height: store.scaled(26))
             .background {
-                ZStack {
-                    if isHovered && !isSelected {
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(store.adaptiveTheme.iconHoverBackground)
-                    }
-                    if isSelected {
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(store.adaptiveTheme.activeTabBackground)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                    .stroke(store.adaptiveTheme.activeTabStroke, lineWidth: 0.75)
-                            )
-                    }
+                if isHovered && !isSelected {
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(store.adaptiveTheme.iconHoverBackground)
                 }
             }
             .contentShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
         .buttonStyle(.plain)
+        .liquidGlassSelectedSurface(
+            isSelected: isSelected,
+            cornerRadius: 6,
+            legacyBackground: store.adaptiveTheme.activeTabBackground,
+            legacyStroke: store.adaptiveTheme.activeTabStroke
+        )
         .overlay(alignment: .bottomTrailing) {
             if tab.isPlayingMedia {
                 TabMediaIndicatorView(tab: tab, theme: store.adaptiveTheme, compact: true)
@@ -1113,6 +1098,11 @@ struct InlineURLBar: View {
         .padding(.horizontal, 9)
         .frame(height: store.scaled(26))
         .frame(minWidth: store.scaled(260), maxWidth: store.scaled(440))
+        .liquidGlassControlSurface(
+            cornerRadius: 8,
+            legacyBackground: store.adaptiveTheme.activeTabBackground,
+            legacyStroke: store.adaptiveTheme.activeTabStroke
+        )
         .background(
             GeometryReader { geo in
                 Color.clear
@@ -1199,13 +1189,14 @@ struct InlineURLBar: View {
         }
         .padding(4)
         .frame(width: 380 * browserUIScale)
-        .background(
-            store.adaptiveTheme.dropdownBackground,
-            in: RoundedRectangle(cornerRadius: 10, style: .continuous)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .stroke(store.adaptiveTheme.dropdownStroke, lineWidth: 1)
+        .liquidGlassDialogSurface(
+            cornerRadius: 10,
+            legacyBackground: store.adaptiveTheme.dropdownBackground,
+            legacyStroke: store.adaptiveTheme.dropdownStroke,
+            usesLegacyBlur: false,
+            primaryShadow: store.adaptiveTheme.dropdownShadow,
+            primaryShadowRadius: 12,
+            primaryShadowY: 4
         )
         .shadow(color: store.adaptiveTheme.dropdownShadow, radius: 12, x: 0, y: 4)
         .background(
@@ -1442,7 +1433,7 @@ private struct ExtensionToolbarButtonContent: View {
                 LeanIcon.extension.fill
                     .interpolation(.high)
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 12 * browserUIScale, height: 12 * browserUIScale)
+                    .frame(width: 16 * browserUIScale, height: 16 * browserUIScale)
                     .foregroundColor(foregroundColor)
                     .frame(width: 24 * browserUIScale, height: 24 * browserUIScale)
                     .background(
@@ -1559,7 +1550,7 @@ struct BookmarkToolbarButton: View {
                 (isCurrentTabBookmarked ? LeanIcon.bookmark.fill : LeanIcon.bookmark.bold)
                     .interpolation(.high)
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 12 * browserUIScale, height: 12 * browserUIScale)
+                    .frame(width: 16 * browserUIScale, height: 16 * browserUIScale)
                     .foregroundColor(foregroundColor)
                     .frame(width: 24 * browserUIScale, height: 24 * browserUIScale)
                     .background(
@@ -1645,12 +1636,12 @@ struct DownloadToolbarButton: View {
                 if hasActive {
                     Capsule()
                         .fill(store.adaptiveTheme.secondaryText.opacity(0.25))
-                        .frame(width: 12 * browserUIScale, height: 2 * browserUIScale)
+                        .frame(width: 16 * browserUIScale, height: 2 * browserUIScale)
                         .offset(y: 8 * browserUIScale)
                         .allowsHitTesting(false)
                     Capsule()
                         .fill(store.isDarkMode ? Color.white : Color.black)
-                        .frame(width: 12 * CGFloat(store.downloadManager.overallProgress) * browserUIScale, height: 2 * browserUIScale)
+                        .frame(width: 16 * CGFloat(store.downloadManager.overallProgress) * browserUIScale, height: 2 * browserUIScale)
                         .offset(y: 8 * browserUIScale)
                         .allowsHitTesting(false)
                 } else if !store.downloadManager.downloads.isEmpty {
@@ -1917,7 +1908,7 @@ struct QuickSettingsPopover: View {
                     HStack(spacing: 8) {
                         LeanIcon.gear.fill
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 12, height: 12)
+                            .frame(width: 16, height: 16)
                         Text("All Settings...")
                             .font(store.headingFont(size: 12))
                         Spacer()
@@ -1949,22 +1940,18 @@ struct QuickSettingsPopover: View {
         }
         .padding(8)
         .frame(width: 228)
-        .background(
-            (store.isDarkMode
+        .liquidGlassDialogSurface(
+            cornerRadius: 11,
+            legacyBackground: (store.isDarkMode
                 ? Color(red: 18/255, green: 18/255, blue: 21/255)
                 : Color(white: 0.995)
-            ).opacity(0.97)
+            ).opacity(0.97),
+            legacyStroke: store.adaptiveTheme.dropdownStroke,
+            primaryShadow: Color.black.opacity(store.isDarkMode ? 0.45 : 0.12),
+            primaryShadowRadius: 18,
+            primaryShadowY: 8,
+            secondaryShadow: Color.black.opacity(store.isDarkMode ? 0.20 : 0.04)
         )
-        .background(
-            VisualEffectBlur(material: .popover, blendingMode: .withinWindow)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .stroke(store.adaptiveTheme.dropdownStroke, lineWidth: 0.75)
-        )
-        .shadow(color: Color.black.opacity(store.isDarkMode ? 0.45 : 0.12), radius: 18, x: 0, y: 8)
-        .shadow(color: Color.black.opacity(store.isDarkMode ? 0.20 : 0.04), radius: 2, x: 0, y: 1)
     }
 }
 
@@ -1983,7 +1970,7 @@ struct QuickSettingsHistoryRow: View {
             HStack(spacing: 8) {
                 LeanIcon.clock.fill
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 12, height: 12)
+                    .frame(width: 16, height: 16)
                     .foregroundColor(isDark ? Color.white.opacity(0.70) : Color.black.opacity(0.60))
                     .frame(width: 16)
 
@@ -2032,7 +2019,7 @@ struct QuickSettingsHistorySubmenu: View {
                 HStack(spacing: 8) {
                     LeanIcon.clock.fill
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 12, height: 12)
+                        .frame(width: 16, height: 16)
                         .foregroundColor(store.adaptiveTheme.secondaryText)
                         .frame(width: 14)
                     Text("No Recent History")
@@ -2068,7 +2055,7 @@ struct QuickSettingsHistorySubmenu: View {
                 HStack(spacing: 8) {
                     LeanIcon.clockCounterClockwise.fill
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 12, height: 12)
+                        .frame(width: 16, height: 16)
                         .foregroundColor(store.adaptiveTheme.secondaryText)
                         .frame(width: 14)
 
@@ -2257,4 +2244,3 @@ struct QuickToggleItem: View {
         }
     }
 }
-

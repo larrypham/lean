@@ -38,6 +38,7 @@
 		4B869623C7F645CA2DC36685 /* BrowserImportMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D76B631664EECE3A7B610D9 /* BrowserImportMergeTests.swift */; };
 		4BDD9B7559C20431FA84A560 /* TabSleepPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634EA02FF905C1C8FB8E1B1 /* TabSleepPolicyTests.swift */; };
 		4D642F93D1BCE6BACD83B656 /* PageLoadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F223D3E0E5D21A9B6965446 /* PageLoadingTests.swift */; };
+		50EDDFA3306A831600D4FDB9 /* LiquidGlassDialogSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EDDFA2306A831600D4FDB9 /* LiquidGlassDialogSurface.swift */; };
 		510DD86C20F775C3F5A542B7 /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72942590E49E85581DFAAC5 /* DownloadManager.swift */; };
 		528B117F29C5A1E8019261C5 /* WebEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFEE1335003A4544272D347D /* WebEngine.swift */; };
 		557148C21986A48B5ABC5FE2 /* GeistMono-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7AF69F861FD9CDBC829BD268 /* GeistMono-Variable.ttf */; };
@@ -181,6 +182,7 @@
 		4CD9886B5A0CFDEBBD7866FC /* Geist-Variable.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Geist-Variable.ttf"; sourceTree = "<group>"; };
 		4CE003CFDB286E7313E3170B /* BrowserImportProgressDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportProgressDialog.swift; sourceTree = "<group>"; };
 		4F64D9D86B5C387FB9E0FB6E /* ChromiumPasswords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumPasswords.swift; sourceTree = "<group>"; };
+		50EDDFA2306A831600D4FDB9 /* LiquidGlassDialogSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidGlassDialogSurface.swift; sourceTree = "<group>"; };
 		51504E57E400453E497CD481 /* PasswordVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordVault.swift; sourceTree = "<group>"; };
 		53149805E8E44A5ECCE884F3 /* LeanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeanView.swift; sourceTree = "<group>"; };
 		55ACE65E20A203180C11BDDD /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
@@ -397,6 +399,7 @@
 				55ACE65E20A203180C11BDDD /* TopBarView.swift */,
 				EFEE1335003A4544272D347D /* WebEngine.swift */,
 				07DBA8C4F95CDBBA11DA6A31 /* Resources */,
+				50EDDFA2306A831600D4FDB9 /* LiquidGlassDialogSurface.swift */,
 			);
 			path = Lean;
 			sourceTree = "<group>";
@@ -680,6 +683,7 @@
 				F8F072CF63D139768651B686 /* LeanCommands.swift in Sources */,
 				A5364002E14974BBC303C3E6 /* LeanIcons.swift in Sources */,
 				5A95D7EC207A24098228BBF3 /* LeanStore.swift in Sources */,
+				50EDDFA3306A831600D4FDB9 /* LiquidGlassDialogSurface.swift in Sources */,
 				BDA7E266340C8AF371134E07 /* LeanTab.swift in Sources */,
 				571263C8F841874C413F13EB /* LeanTheme.swift in Sources */,
 				EF81104AE976E2079F2656FE /* LeanView.swift in Sources */,

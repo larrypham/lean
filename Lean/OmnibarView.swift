@@ -34,6 +34,62 @@ struct OmnibarView: View {
     }
 
     var body: some View {
+        styledOmnibar
+            .background(
+                GeometryReader { geo in
+                    Color.clear
+                        .onAppear {
+                            if isFloating {
+                                store.floatingPaletteFrame = geo.frame(in: .global)
+                            }
+                        }
+                        .onChange(of: geo.frame(in: .global)) { _, newFrame in
+                            if isFloating {
+                                let old = store.floatingPaletteFrame
+                                if abs(old.origin.x - newFrame.origin.x) > 1
+                                    || abs(old.origin.y - newFrame.origin.y) > 1
+                                    || abs(old.width - newFrame.width) > 1
+                                    || abs(old.height - newFrame.height) > 1 {
+                                    store.floatingPaletteFrame = newFrame
+                                }
+                            }
+                        }
+                }
+            )
+            .background(OmnibarFocusAcquirer())
+            .animation(.easeOut(duration: 0.12), value: showSuggestions)
+            .onAppear(perform: handleAppear)
+            .onChange(of: store.isFloatingOmnibarVisible) { _, isVisible in
+                handleFloatingVisibilityChange(isVisible)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .focusAddress)) { _ in
+                requestFieldFocus()
+            }
+            .onChange(of: isFieldFocused) { _, focused in
+                if !focused && isFloating && store.isFloatingOmnibarVisible {
+                    DispatchQueue.main.async {
+                        if store.isFloatingOmnibarVisible {
+                            isFieldFocused = true
+                        }
+                    }
+                } else if focused && !isFloating {
+                    withAnimation(.easeOut(duration: 0.16)) {
+                        store.isNewTabOmnibarFloating = true
+                    }
+                }
+            }
+            .onChange(of: query) { _, newQuery in
+                selectedIndex = 0
+                isNavigatingSuggestions = false
+                if !newQuery.isEmpty && !isFloating {
+                    withAnimation(.easeOut(duration: 0.16)) {
+                        store.isNewTabOmnibarFloating = true
+                    }
+                }
+            }
+    }
+
+    private var omnibarContent: some View {
         VStack(spacing: 0) {
             inputHeader
 
@@ -48,60 +104,26 @@ struct OmnibarView: View {
                 isFieldFocused = true
             }
         }
-        .background(cardBackground)
-        .overlay(cardBorder)
-        .shadow(color: store.isDarkMode ? Color.black.opacity(0.3) : Color.black.opacity(0.06), radius: 10, x: 0, y: 3)
-        .background(
-            GeometryReader { geo in
-                Color.clear
-                    .onAppear {
-                        if isFloating {
-                            store.floatingPaletteFrame = geo.frame(in: .global)
-                        }
-                    }
-                    .onChange(of: geo.frame(in: .global)) { _, newFrame in
-                        if isFloating {
-                            let old = store.floatingPaletteFrame
-                            if abs(old.origin.x - newFrame.origin.x) > 1
-                                || abs(old.origin.y - newFrame.origin.y) > 1
-                                || abs(old.width - newFrame.width) > 1
-                                || abs(old.height - newFrame.height) > 1 {
-                                store.floatingPaletteFrame = newFrame
-                            }
-                        }
-                    }
-            }
-        )
-        .background(OmnibarFocusAcquirer())
-        .animation(.easeOut(duration: 0.12), value: showSuggestions)
-        .onAppear(perform: handleAppear)
-        .onChange(of: store.isFloatingOmnibarVisible) { _, isVisible in
-            handleFloatingVisibilityChange(isVisible)
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .focusAddress)) { _ in
-            requestFieldFocus()
-        }
-        .onChange(of: isFieldFocused) { _, focused in
-            if !focused && isFloating && store.isFloatingOmnibarVisible {
-                DispatchQueue.main.async {
-                    if store.isFloatingOmnibarVisible {
-                        isFieldFocused = true
-                    }
-                }
-            } else if focused && !isFloating {
-                withAnimation(.easeOut(duration: 0.16)) {
-                    store.isNewTabOmnibarFloating = true
-                }
-            }
-        }
-        .onChange(of: query) { _, newQuery in
-            selectedIndex = 0
-            isNavigatingSuggestions = false
-            if !newQuery.isEmpty && !isFloating {
-                withAnimation(.easeOut(duration: 0.16)) {
-                    store.isNewTabOmnibarFloating = true
-                }
-            }
+    }
+
+    @ViewBuilder
+    private var styledOmnibar: some View {
+        if #available(macOS 26.0, *) {
+            omnibarContent
+                .glassEffect(
+                    .regular.interactive(),
+                    in: .rect(cornerRadius: showSuggestions ? 16 : 12)
+                )
+        } else {
+            omnibarContent
+                .background(cardBackground)
+                .overlay(cardBorder)
+                .shadow(
+                    color: store.isDarkMode ? Color.black.opacity(0.3) : Color.black.opacity(0.06),
+                    radius: 10,
+                    x: 0,
+                    y: 3
+                )
         }
     }
 

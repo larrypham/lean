@@ -36,7 +36,12 @@ struct SuggestionRow: View {
             }
             .padding(.horizontal, 12)
             .frame(height: 42)
-            .background(rowBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .liquidGlassSelectedSurface(
+                isSelected: isSelected || isHovered,
+                cornerRadius: 10,
+                legacyBackground: rowBackground,
+                legacyStroke: .clear
+            )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
